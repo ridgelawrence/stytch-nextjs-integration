@@ -100,7 +100,9 @@ const LoginWithSMS = () => {
     <div className={styles.title}>
       <h1 style={{ textAlign: "left" }}>Log in with phone number</h1>
       <p style={{ textAlign: "left", fontSize: "15px", marginBottom: "40px" }}>
-        {"This is a direct API integration."}
+        {
+          "This is an example of integrating with Stytch's API using the node client."
+        }
       </p>
       {!otpSubmitted
         ? SendOTPForm(setOTPSubmitted, phoneNumber, setPhoneNumber, setMethodId)

@@ -1,54 +1,14 @@
-import { Stytch } from "@stytch/stytch-react";
-import styles from "../styles/Home.module.css";
 import withSession, { ServerSideProps } from "../lib/withSession";
-import LoginWithSMS from "../components/loginWithSMS";
 import Profile from "../components/profile";
+import Link from "next/link";
+import styles from "../styles/Home.module.css";
 
-type AppProps = { publicToken: string; user?: object };
-
-const stytchProps = {
-  config: {
-    loginConfig: {
-      magicLinkUrl: "http://localhost:3000/api/authenticate_magic_link",
-      expirationMinutes: 30,
-    },
-    createUserConfig: {
-      magicLinkUrl: "http://localhost:3000/api/authenticate_magic_link",
-      expirationMinutes: 30,
-    },
-  },
-  style: {
-    fontFamily: '"Helvetica New", Helvetica, sans-serif',
-    button: {
-      backgroundColor: "#0577CA",
-    },
-    input: {
-      textColor: "#090909",
-    },
-    width: "321px",
-  },
-  publicToken: process.env.STYTCH_PUBLIC_TOKEN || "",
-  callbacks: {
-    onEvent: (data: any) => {
-      // TODO: check whether the user exists in your DB
-      if (data.eventData.type === "USER_EVENT_TYPE") {
-        console.log({
-          userId: data.eventData.userId,
-          email: data.eventData.email,
-        });
-      }
-    },
-    onSuccess: (data: any) => console.log(data),
-    onError: (data: any) => console.log(data),
-  },
-};
+export type AppProps = { user?: object };
 
 const getServerSidePropsHandler: ServerSideProps = async ({ req }) => {
   // Get the user's session based on the request
   const user = req.session.get("user");
-  const props: AppProps = {
-    publicToken: stytchProps.publicToken,
-  };
+  const props: AppProps = {};
   if (user) {
     props.user = user;
   }
@@ -59,22 +19,24 @@ const getServerSidePropsHandler: ServerSideProps = async ({ req }) => {
 
 export const getServerSideProps = withSession(getServerSidePropsHandler);
 
-const App = ({ user, publicToken }: any) => {
+const App = ({ user }: any) => {
   return (
     <div>
-      <div className={styles.header}>{"Stytch.js + Next.js"}</div>
       <div className={styles.container}>
         <main className={styles.main}>
+          <div className={styles.header}>{"Stytch.js + Next.js Examples"}</div>
           {!user ? (
             <div>
-              <Stytch
-                publicToken={publicToken || ""}
-                config={stytchProps.config}
-                style={stytchProps.style}
-                callbacks={stytchProps.callbacks}
-              />
-              <hr />
-              <LoginWithSMS />
+              <div className={styles.title}>
+                <Link href="/sdk_example">
+                  <a>{"Stytch SDK + next-js magic links example"}</a>
+                </Link>
+              </div>
+              <div className={styles.title}>
+                <Link href="/api_example">
+                  <a>{"Stytch API + next-js OTP example"}</a>
+                </Link>
+              </div>
             </div>
           ) : (
             Profile(user)

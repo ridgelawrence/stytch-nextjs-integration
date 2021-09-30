@@ -16,8 +16,8 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 80px;
-  width: 500px;
-  height: 500px;
+  width: 600px;
+  height: 550px;
 }
 
 @media only screen and (max-width: 600px) {

@@ -10,11 +10,11 @@ import LoginEntryPoint from '../components/LoginEntrypoint';
 const stytchProps = {
   config: {
     loginConfig: {
-      magicLinkUrl: 'http://localhost:3000/api/authenticate_magic_link',
+      magicLinkUrl: `${process.env.BASE_URL}/api/authenticate_magic_link`,
       expirationMinutes: 30,
     },
     createUserConfig: {
-      magicLinkUrl: 'http://localhost:3000/api/authenticate_magic_link',
+      magicLinkUrl: `${process.env.BASE_URL}/api/authenticate_magic_link`,
       expirationMinutes: 30,
     },
   },

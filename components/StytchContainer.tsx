@@ -12,7 +12,7 @@ const StytchContainer = (props: Props) => {
   return (
     <div className={styles.container}>
       <div>{children}</div>
-      <Image alt="Powered by Stytch" height={15} src={lockup} width={150} />
+      <Image alt="Powered by Stytch" height={15} src={lockup} width={250} />
     </div>
   );
 };

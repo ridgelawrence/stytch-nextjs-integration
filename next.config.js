@@ -6,4 +6,8 @@ module.exports = {
     COOKIE_NAME: process.env.COOKIE_NAME,
     STYTCH_PROJECT_ENV: process.env.STYTCH_PROJECT_ENV,
   },
+  webpack: (config) => {
+    config.experiments = { topLevelAwait: true };
+    return config;
+  },
 };

@@ -4,10 +4,11 @@ import StytchContainer from '../components/StytchContainer';
 import withSession, { ServerSideProps } from '../lib/withSession';
 import { getUsers, addUser, deleteUserById } from '../lib/usersUtils';
 import AddIcon from '@material-ui/icons/AddRounded';
-import { Hidden, Button, makeStyles, Table, TableBody, TableCell, TableHead, TableRow, InputLabel, TextField, DialogContent, DialogTitle } from '@material-ui/core';
+import { Hidden, Button, makeStyles, Table, TableBody, TableCell, TableHead, TableRow, InputLabel, TextField, DialogContent, DialogTitle, Collapse,  IconButton } from '@material-ui/core';
 import { useRouter } from 'next/router';
-import { User } from '../pages/api/users/';
 import Dialog from '@mui/material/Dialog';
+import Alert from '@mui/material/Alert';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 type Props = {
@@ -19,14 +20,14 @@ type Props = {
 // const users = async (): Promise<User[]> => { return getUsers()};
 var users = await getUsers();
 
-
-
 const Profile = (props: Props) => {
   const { user } = props;
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
+  const [deleteOpen, setDeleteOpen] = React.useState(false)
+  const [submitOpen, setSubmitOpen] = React.useState(false)
 
   useEffect(() => {
     if (!user) {
@@ -38,6 +39,14 @@ const Profile = (props: Props) => {
     setOpen(!open);
     console.log("toggled open to " +open)
   }
+
+  function toggleDelete(){
+    setDeleteOpen(!deleteOpen)
+  }
+
+  function toggleSubmit(){
+    setSubmitOpen(!submitOpen)
+  }
   
   function submitUser(){
     //do nothing if empty
@@ -46,16 +55,19 @@ const Profile = (props: Props) => {
       return
     }
 
+    //closes modal
     toggleOpen()
     //grab name and email
      addUser(name, email, "temp")
-     
-    //calll api
-  }
+
+     //opens popup
+     toggleSubmit()
+
+    }
 
   function deleteUser(id: number){
     deleteUserById(id)
-    this.forceUpdate()
+    toggleDelete()
   }
 
   const signOut = async () => {
@@ -70,23 +82,64 @@ const Profile = (props: Props) => {
       {!user ? (
         <div />
       ) : (
+
+        <div>
+        <Collapse in={deleteOpen}>
+          
+          <Alert
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={toggleDelete}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+          sx={{ mb: 2 }}
+        >
+          User was successfully <b> deleted </b> - refresh the page.
+        </Alert>
+        </Collapse>
+
+        <Collapse in={submitOpen}>
+          
+          <Alert
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={toggleSubmit}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+          sx={{ mb: 2 }}
+        >
+          User was successfully <b> added </b>  - refresh the page.
+        </Alert>
+        </Collapse>
+
         <StytchContainer>
+
           <TableHead>
             <TableRow>
               <TableCell> <b>Name </b></TableCell>
               <TableCell><b> Email </b> </TableCell>
-              <TableCell><b> Actions </b> </TableCell>
+              <TableCell> </TableCell>
 
             </TableRow>
           </TableHead>
-        <TableBody>
+          <TableBody>
          {users.map(user => (
-             <TableRow key={user.name} id={user.id}>  <TableCell> {user.name} </TableCell> <TableCell> {user.email} </TableCell> <TableCell>  <Button
+             <TableRow key={user.name} id={user.id}>  <TableCell> {user.name} </TableCell> <TableCell> {user.email} </TableCell> <TableCell> <IconButton
              color="secondary"
              onClick={() => deleteUser(user.id)}
            >
-             Delete
-           </Button> </TableCell> </TableRow>
+             <CloseIcon/>
+           </IconButton> </TableCell> </TableRow>
           ))}  
 
           <TableRow>
@@ -132,6 +185,7 @@ const Profile = (props: Props) => {
           </TableBody>
 
         </StytchContainer>
+        </div>
       )}
     </>
   );

@@ -1,7 +1,7 @@
 // This API route authenticates Stytch OTP codes.
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Session } from 'next-iron-session';
-import withSession from '../../lib/withSession';
+// import withSession from '../../lib/withSession';
 import loadStytch from '../../lib/loadStytch';
 type NextIronRequest = NextApiRequest & { session: Session };
 
@@ -42,4 +42,4 @@ export async function handler(req: NextIronRequest, res: NextApiResponse<Data>) 
   }
 }
 
-export default withSession(handler);
+export default handler;

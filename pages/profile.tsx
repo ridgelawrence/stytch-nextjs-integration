@@ -1,43 +1,48 @@
 import React, { useEffect } from 'react';
 import styles from '../styles/Home.module.css';
 import StytchContainer from '../components/StytchContainer';
-import withSession, { ServerSideProps } from '../lib/withSession';
-import { getUsers, addUser, deleteUserById } from '../lib/usersUtils';
+// import withSession, { ServerSideProps } from '../lib/withSession';
+import { ServerSideProps } from '../lib/StytchSession';
+import { getUsers, getUsersWithToken, addUser, deleteUserById } from '../lib/usersUtils';
+import { User } from '../pages/api/users/';
 import AddIcon from '@material-ui/icons/AddRounded';
 import { Hidden, Button, makeStyles, Table, TableBody, TableCell, TableHead, TableRow, InputLabel, TextField, DialogContent, DialogTitle, Collapse,  IconButton } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import Dialog from '@mui/material/Dialog';
 import Alert from '@mui/material/Alert';
 import CloseIcon from '@mui/icons-material/Close';
-
+import {validSessionToken} from '../lib/StytchSession';
+import Cookies from 'cookies';
 
 type Props = {
-  user?: {
-    id: string;
-  };
+  token?: string;
+  users?: User[];
 };
 
+// var users = getUsers(token)
+
 // const users = async (): Promise<User[]> => { return getUsers()};
-var users = await getUsers();
 
 const Profile = (props: Props) => {
-  const { user } = props;
+  const { token, users } = props;
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [deleteOpen, setDeleteOpen] = React.useState(false)
   const [submitOpen, setSubmitOpen] = React.useState(false)
+  const [usersState, setUsers] = React.useState(users)
+  
+  // var usersResp = (users.then(userResp => userResp)) as User[]
 
   useEffect(() => {
-    if (!user) {
+    if (!token) {
       router.replace('/');
     }
   });
 
   function toggleOpen(){
     setOpen(!open);
-    console.log("toggled open to " +open)
   }
 
   function toggleDelete(){
@@ -57,20 +62,34 @@ const Profile = (props: Props) => {
 
     //closes modal
     toggleOpen()
-    //grab name and email
-     addUser(name, email, "temp")
 
+
+    //grab name and email
+   addUser(name, email, "temp")
+  
      //opens popup
      toggleSubmit()
 
     }
 
   function deleteUser(id: number){
+    //remove user fromt the DB
     deleteUserById(id)
+    
+
+    //remove user from the list
+    users?.forEach(
+      (element, index) =>{
+        if(element.id == id) delete users[index]
+      }
+    )
+
+    setUsers(users)
     toggleDelete()
   }
 
   const signOut = async () => {
+    console.log("click")
     const resp = await fetch('/api/logout', { method: 'POST' });
     if (resp.status === 200) {
       router.push('/');
@@ -79,10 +98,9 @@ const Profile = (props: Props) => {
 
   return (
     <>
-      {!user ? (
-        <div />
+      {!token ? (
+        <div></div>
       ) : (
-
         <div>
         <Collapse in={deleteOpen}>
           
@@ -123,7 +141,7 @@ const Profile = (props: Props) => {
         </Collapse>
 
         <StytchContainer>
-
+      
           <TableHead>
             <TableRow>
               <TableCell> <b>Name </b></TableCell>
@@ -133,14 +151,23 @@ const Profile = (props: Props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-         {users.map(user => (
-             <TableRow key={user.name} id={user.id}>  <TableCell> {user.name} </TableCell> <TableCell> {user.email} </TableCell> <TableCell> <IconButton
-             color="secondary"
-             onClick={() => deleteUser(user.id)}
-           >
-             <CloseIcon/>
-           </IconButton> </TableCell> </TableRow>
-          ))}  
+         {            usersState.map(user => ( <TableRow key={user.name} id={user.id}>  <TableCell> {user.name} </TableCell> <TableCell> {user.email} </TableCell> <TableCell> 
+              <IconButton
+           color="secondary"
+           onClick={() => deleteUser(user.id)}
+         >
+           <CloseIcon/>
+         </IconButton> </TableCell> </TableRow>))
+        }
+         
+        {/* //  users.map(user => (
+        //      <TableRow key={user.name} id={user.id}>  <TableCell> {user.name} </TableCell> <TableCell> {user.email} </TableCell> <TableCell> <IconButton
+        //      color="secondary"
+        //      onClick={() => deleteUser(user.id)}
+        //    >
+        //      <CloseIcon/>
+        //    </IconButton> </TableCell> </TableRow>
+        //   ))}   */}
 
           <TableRow>
             <Button startIcon={<AddIcon />} onClick={toggleOpen} size="small">
@@ -184,20 +211,28 @@ const Profile = (props: Props) => {
           </TableRow>
           </TableBody>
 
-        </StytchContainer>
+          <button className={styles.primaryButton} onClick={signOut}>
+            Sign out
+          </button>
+          </StytchContainer>
+
         </div>
       )}
     </>
   );
 };
 
-const getServerSidePropsHandler: ServerSideProps = async ({ req }) => {
+
+
+const getServerSidePropsHandler: ServerSideProps = async ({ req}) => {
+  var users = await getUsers(req.cookies[process.env.COOKIE_NAME as string])
   // Get the user's session based on the request
-  const user = req.session.get('user') ?? null;
-  const props: Props = { user };
-  return { props };
+  return { props : { 
+    token: req.cookies[process.env.COOKIE_NAME as string] || "",
+  users: users} };
 };
 
-export const getServerSideProps = withSession(getServerSidePropsHandler);
+
+export const getServerSideProps = getServerSidePropsHandler;
 
 export default Profile;

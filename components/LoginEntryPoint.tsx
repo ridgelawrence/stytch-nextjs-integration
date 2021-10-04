@@ -9,13 +9,14 @@ type Props = {
 
 const LoginEntryPoint = (props: Props) => {
   const { setLoginMethod } = props;
+  console.log(process.env.STYTCH_PUBLIC_TOKEN);
+
   return (
     <StytchContainer>
       <h2>Login or Signup</h2>
       <button className={styles.entryButton} onClick={() => setLoginMethod(LoginMethod.SDK)}>
         Continue with email
       </button>
-
     </StytchContainer>
   );
 };

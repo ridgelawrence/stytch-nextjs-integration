@@ -1,6 +1,7 @@
 import { Stytch } from '@stytch/stytch-react';
 import styles from '../styles/Home.module.css';
-import withSession, { ServerSideProps } from '../lib/withSession';
+// import withSession, { ServerSideProps } from '../lib/withSession';
+import { ServerSideProps } from '../lib/StytchSession';
 import LoginWithSMS from '../components/LoginWithSMS';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -10,11 +11,11 @@ import LoginEntryPoint from '../components/LoginEntrypoint';
 const stytchProps = {
   config: {
     loginConfig: {
-      magicLinkUrl: `${process.env.BASE_URL}/api/authenticate_magic_link`,
+      magicLinkUrl: `http://localhost:3000/api/authenticate_magic_link`,
       expirationMinutes: 30,
     },
     createUserConfig: {
-      magicLinkUrl: `${process.env.BASE_URL}/api/authenticate_magic_link`,
+      magicLinkUrl: `http://localhost:3000/api/authenticate_magic_link`,
       expirationMinutes: 30,
     },
   },
@@ -67,7 +68,7 @@ const App = (props: Props) => {
     [LoginMethod.SDK]: (
       <div className={styles.container}>
         <Stytch
-          publicToken={publicToken || ''}
+          publicToken={process.env.STYTCH_PUBLIC_TOKEN || ''}
           config={stytchProps.config}
           style={stytchProps.style}
           callbacks={stytchProps.callbacks}
@@ -83,16 +84,24 @@ const App = (props: Props) => {
   );
 };
 
+// const getServerSidePropsHandler: ServerSideProps = async ({ req }) => {
+//   // Get the user's session based on the request
+//   const user = req.session.get('user') ?? null;
+//   const props: Props = {
+//     publicToken: stytchProps.publicToken,
+//     user,
+//   };
+//   return { props };
+// };
+
+// export const getServerSideProps = withSession(getServerSidePropsHandler);
+
+
 const getServerSidePropsHandler: ServerSideProps = async ({ req }) => {
   // Get the user's session based on the request
-  const user = req.session.get('user') ?? null;
-  const props: Props = {
-    publicToken: stytchProps.publicToken,
-    user,
-  };
-  return { props };
+  return { props : { token: req.cookies[process.env.COOKIE_NAME as string] || ""} };
 };
 
-export const getServerSideProps = withSession(getServerSidePropsHandler);
+export const getServerSideProps = getServerSidePropsHandler;
 
 export default App;

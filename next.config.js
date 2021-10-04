@@ -7,7 +7,9 @@ module.exports = {
     STYTCH_PROJECT_ENV: process.env.STYTCH_PROJECT_ENV,
   },
   webpack: (config) => {
-    config.experiments = { topLevelAwait: true };
+    config.experiments = { 
+      topLevelAwait: true,
+     };
     return config;
   },
 };

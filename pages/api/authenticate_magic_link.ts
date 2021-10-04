@@ -1,8 +1,12 @@
 // This API route authenticates a Stytch magic link.
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Session } from 'next-iron-session';
-import withSession from '../../lib/withSession';
+// import withSession from '../../lib/withSession';
 import loadStytch from '../../lib/loadStytch';
+import Cookies from 'cookies';
+import {serialize} from 'cookie';
+
+
 type NextIronRequest = NextApiRequest & { session: Session };
 
 type Data = {
@@ -10,26 +14,36 @@ type Data = {
 };
 
 export async function handler(req: NextIronRequest, res: NextApiResponse<Data>) {
+  
+  console.log("authenticating")
   if (req.method === 'GET') {
     const client = loadStytch();
     const { token } = req.query;
+
     try {
-      const resp = await client.magicLinks.authenticate(token as string);
-      // Set session
-      req.session.destroy();
-      req.session.set('user', {
-        id: resp.user_id,
-      });
-      // Save additional user data here
-      await req.session.save();
+      //authenticate request and create 1 hour session
+      const resp = await client.magicLinks.authenticate(token as string, {session_duration_minutes: 60});
+      
+
+      //send user to profile with cookies in response
+      res.setHeader('Set-Cookie', serialize(process.env.COOKIE_NAME as string, resp.session_token as string, { path: '/' }));
+      console.log("Session_token: ", resp.session_token)
+      console.log("Session_id: ", resp.session?.session_id)
+
+      //update global cookies
+      // const cookies = new Cookies(req, res)
+      // cookies.set(process.env.COOKIE_NAME,resp.session_token)
+
       res.redirect('/profile');
+      return;
     } catch (error) {
-      console.log(error);
+      console.log("Failed to login user", token , error);
       res.status(400).json({ error });
+      return;
     }
   } else {
     // Handle any other HTTP method
   }
 }
 
-export default withSession(handler);
+export default handler;

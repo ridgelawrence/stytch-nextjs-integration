@@ -1,13 +1,20 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
 import { PSDB } from 'planetscale-node'
+import { validSessionToken } from '../../../../lib/StytchSession';
 
 const conn = new PSDB('main')
 export async function handler(req: NextApiRequest, res: NextApiResponse){
-    if( req.method == 'GET'){
+  var token = (req.query["token"] || req.cookies[process.env.COOKIE_NAME as string]) as string
+  if (!validSessionToken(token)){
+    res.redirect("/")
+  }
+
+  if( req.method == 'GET'){
       getUser(conn, req, res)
     } else if(req.method == "DELETE") {
       deleteUser(conn, req,res)
     }
+    return
 }
 
 
@@ -22,6 +29,7 @@ export async function handler(req: NextApiRequest, res: NextApiResponse){
   } catch (e) {
     res.status(500).json({"error":"an error occurred"})
   }
+  return
 }
 
 //deleteUser remove a single user
@@ -35,6 +43,7 @@ export async function handler(req: NextApiRequest, res: NextApiResponse){
   } catch (e) {
     res.status(500).json({"error":"an error occurred"})
   }
+  return
 }
 
 export default handler;

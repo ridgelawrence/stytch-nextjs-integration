@@ -1,7 +1,9 @@
 // This API route logs a user out.
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Session } from 'next-iron-session';
-import withSession from '../../lib/withSession';
+import {serialize} from 'cookie';
+
+// import withSession from '../../lib/withSession';
 type NextIronRequest = NextApiRequest & { session: Session };
 
 type Data = {
@@ -12,7 +14,11 @@ export async function handler(req: NextIronRequest, res: NextApiResponse<Data>) 
   if (req.method === 'POST') {
     try {
       // Set session
-      req.session.destroy();
+      res.setHeader(
+        'Set-Cookie', 
+        serialize(process.env.COOKIE_NAME as string, 
+        "",
+        { path: '/',maxAge:-1,}));
       res.redirect('/');
     } catch (error) {
       res.status(400).json({ error });
@@ -22,4 +28,4 @@ export async function handler(req: NextIronRequest, res: NextApiResponse<Data>) 
   }
 }
 
-export default withSession(handler);
+export default handler;

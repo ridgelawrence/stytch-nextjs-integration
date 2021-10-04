@@ -1,5 +1,8 @@
+import { ClassNames } from '@emotion/react';
 import type {NextApiRequest, NextApiResponse} from 'next';
 import { PSDB } from 'planetscale-node'
+import {validSession, validSessionToken} from '../../../lib/StytchSession';
+import Cookies from 'cookies';
 
 const conn = new PSDB('main')
 
@@ -11,11 +14,17 @@ export interface User {
  }
 
 export async function handler(req: NextApiRequest, res: NextApiResponse){
-    if( req.method == 'GET'){
-      getUsers(conn, req,res)
-    } else if(req.method == "POST") {
-      addUser(conn, req, res)
-    }
+  var token = (req.query["token"] || req.cookies[process.env.COOKIE_NAME as string]) as string
+  if (!validSessionToken(token)){
+    res.redirect("/")
+  }
+
+  if(req.method == 'GET'){
+    getUsers(conn, req,res)
+  } else if(req.method == "POST") {
+    addUser(conn, req, res)
+  }
+  return
 }
 
 //getUsers retrieve all users
@@ -29,6 +38,7 @@ export async function handler(req: NextApiRequest, res: NextApiResponse){
   } catch (e) {
     res.status(500).json({"error":"an error occurred"})
   }
+  return
 }
 
 //addUser create a new user
@@ -44,6 +54,7 @@ export async function handler(req: NextApiRequest, res: NextApiResponse){
   } catch (e) {
     res.status(500).json({"error":"an error occurred"})
   }
+  return
 }
 
 export default handler;

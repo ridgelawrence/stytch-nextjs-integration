@@ -21,6 +21,6 @@ async function inviteUser(url:string, duration: bigint, email: string, name: str
         console.log(resp)
     })
     .catch(err => {
-        console.log(err)
+        console.log("Failed invite user", err)
     }); 
 }

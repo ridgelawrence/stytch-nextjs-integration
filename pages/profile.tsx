@@ -1,18 +1,13 @@
 import React, { useEffect } from 'react';
 import styles from '../styles/Home.module.css';
 import StytchContainer from '../components/StytchContainer';
+import Notification from '../components/Notification';
+import UsersTable from '../components/UsersTable';
+
 // import withSession, { ServerSideProps } from '../lib/withSession';
 import { ServerSideProps } from '../lib/StytchSession';
-import { getUsers, getUsersWithToken, addUser, deleteUserById } from '../lib/usersUtils';
-import { User } from '../pages/api/users/';
-import AddIcon from '@material-ui/icons/AddRounded';
-import { Hidden, Button, makeStyles, Table, TableBody, TableCell, TableHead, TableRow, InputLabel, TextField, DialogContent, DialogTitle, Collapse,  IconButton } from '@material-ui/core';
+import { getUsers, addUser, deleteUserById } from '../lib/usersUtils';
 import { useRouter } from 'next/router';
-import Dialog from '@mui/material/Dialog';
-import Alert from '@mui/material/Alert';
-import CloseIcon from '@mui/icons-material/Close';
-import {validSessionToken} from '../lib/StytchSession';
-import Cookies from 'cookies';
 
 type Props = {
   token?: string;
@@ -43,10 +38,6 @@ const Profile = (props: Props) => {
 
   function toggleOpen(){
     setOpen(!open);
-  }
-
-  function toggleDelete(){
-    setDeleteOpen(!deleteOpen)
   }
 
   function toggleSubmit(){
@@ -85,7 +76,6 @@ const Profile = (props: Props) => {
     )
 
     setUsers(users)
-    toggleDelete()
   }
 
   const signOut = async () => {
@@ -102,114 +92,21 @@ const Profile = (props: Props) => {
         <div></div>
       ) : (
         <div>
-        <Collapse in={deleteOpen}>
-          
-          <Alert
-          action={
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              size="small"
-              onClick={toggleDelete}
-            >
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          }
-          sx={{ mb: 2 }}
-        >
-          User was successfully <b> deleted </b> - refresh the page.
-        </Alert>
-        </Collapse>
 
-        <Collapse in={submitOpen}>
-          
-          <Alert
-          action={
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              size="small"
-              onClick={toggleSubmit}
-            >
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          }
-          sx={{ mb: 2 }}
-        >
-          User was successfully <b> added </b>  - refresh the page.
-        </Alert>
-        </Collapse>
+        <Notification open={open} toggle={toggleSubmit} />
 
         <StytchContainer>
       
-          <TableHead>
-            <TableRow>
-              <TableCell> <b>Name </b></TableCell>
-              <TableCell><b> Email </b> </TableCell>
-              <TableCell> </TableCell>
+         <UsersTable 
+         users={usersState} 
+         setName={setName}
+         setEmail={setEmail}
+         deleteUser={deleteUser} 
+         toggle={toggleOpen} 
+         isOpen={open} 
+         submit={submitUser} 
+         />
 
-            </TableRow>
-          </TableHead>
-          <TableBody>
-         {            usersState.map(user => ( <TableRow key={user.name} id={user.id}>  <TableCell> {user.name} </TableCell> <TableCell> {user.email} </TableCell> <TableCell> 
-              <IconButton
-           color="secondary"
-           onClick={() => deleteUser(user.id)}
-         >
-           <CloseIcon/>
-         </IconButton> </TableCell> </TableRow>))
-        }
-         
-        {/* //  users.map(user => (
-        //      <TableRow key={user.name} id={user.id}>  <TableCell> {user.name} </TableCell> <TableCell> {user.email} </TableCell> <TableCell> <IconButton
-        //      color="secondary"
-        //      onClick={() => deleteUser(user.id)}
-        //    >
-        //      <CloseIcon/>
-        //    </IconButton> </TableCell> </TableRow>
-        //   ))}   */}
-
-          <TableRow>
-            <Button startIcon={<AddIcon />} onClick={toggleOpen} size="small">
-              Invite
-            </Button>
-            <Dialog open={open} onClose={toggleOpen} > 
-
-            <DialogTitle>{`Invite`}</DialogTitle>
-            <DialogContent>
-            <InputLabel > Name</InputLabel>
-              <TextField
-                autoFocus
-                margin="dense"
-                placeholder="Ada Lovelace"
-                variant="standard"
-                size="small"
-                onChange={(e) => setName(e.target.value)}
-              />
-              <InputLabel>Email</InputLabel>
-              <TextField
-                autoFocus
-                margin="dense"
-                placeholder="ada@lovelace.com"
-                variant="standard"
-                size="small"
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            <Button
-            onClick={submitUser}
-            style={{
-              backgroundColor: "#0D4052",
-              color:"white"
-          }}
-            variant="contained"
-            size="small"
-          >
-            Confirm
-          </Button>
-              </DialogContent>
-             </Dialog>
-          </TableRow>
-          </TableBody>
 
           <button className={styles.primaryButton} onClick={signOut}>
             Sign out

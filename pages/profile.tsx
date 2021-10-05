@@ -60,11 +60,13 @@ const Profile = (props: Props) => {
     if (regexp.test(email)){
       //invite the user via stytch
       inviteUser(60, name, email).then(resp => {
+        console.log(resp)
         if(resp.status == 401) {
           router.push("/")
         }
         //add user to table
         addUser(name,email, "temp").then(resp => {
+          console.log(resp)
           if(resp.status == 401) {
             router.push("/")
           }
@@ -96,7 +98,6 @@ const Profile = (props: Props) => {
     }
     )
     
-    console.log("Before array delete", usersState)
 
     //remove user from the list
     usersState?.forEach(

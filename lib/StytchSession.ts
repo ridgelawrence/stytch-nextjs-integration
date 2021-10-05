@@ -10,21 +10,18 @@ export type ServerSideProps = ({ req }: { req: NextApiRequest }) => Promise<any>
 
 export  function validSessionToken (token: string ): boolean {
     //authenticate the session
+    var output:boolean = false;
    client.sessions.authenticate({session_token: token})
     .then(sessionAuthResp => { 
-        //if the cookie has expired, then revoke it
-        if(Date.now() > sessionAuthResp.session.expires_at.getTime()) {
-            //revoke session
-            client.sessions.revoke({session_id: sessionAuthResp.session.session_id})
-
-            //clear cookie
-            return false;
+        if (sessionAuthResp.status_code != BigInt(200)) {
+            output = false
         }
-        return true
+        output =  true
+
      })
     .catch(err => { 
         console.error("Failed to validate session. Token = ",token, err)
-        return false
+        output =  false
     });
-    return true
+    return output
   }

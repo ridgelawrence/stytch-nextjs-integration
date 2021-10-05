@@ -7,9 +7,10 @@ export async function handler(req: NextApiRequest, res: NextApiResponse){
   var token = (req.query["token"] || req.cookies[process.env.COOKIE_NAME as string]) as string
   if (!validSessionToken(token)){
     res.status(401).json({"error": "unauthorized"})
+    console.log("failed to validate")
     return
   } 
-
+  console.log("validated")
   if( req.method == 'GET'){
       getUser(conn, req, res)
     } else if(req.method == "DELETE") {

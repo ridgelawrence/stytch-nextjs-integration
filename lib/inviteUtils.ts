@@ -1,26 +1,20 @@
-import loadStytch from "./loadStytch";
+import {BASE_URL} from './constants'
 
-const url = `${process.env.BASE_URL}/api/authenticate_magic_link`
+const url = `${BASE_URL}/api/invite_user`
 
-async function inviteUser(url:string, duration: bigint, email: string, name: string, ){
-    const client = loadStytch()
+export async function inviteUser( duration_minutes: number, name: string, email: string){
+       
+    const resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+            email:email,
+        })
+      });
+      
+      if(!resp.ok){
+          throw new Error("unable to invite user")
+      }
 
-    // params are of type stytch.InviteByEmailRequest
-    const params = { 
-        email: email,
-        invite_magic_link_url: url,
-        invite_expiration_minutes: duration,
-        name: {
-            first_name: name,
-        }
-    };
-
-
-    client.magicLinks.email.invite(params)
-    .then(resp => {
-        console.log(resp)
-    })
-    .catch(err => {
-        console.log("Failed invite user", err)
-    }); 
+      const data = await resp.json();
+      return data;
 }

@@ -34,8 +34,7 @@ export async function handler(req: NextIronRequest, res: NextApiResponse<Data>) 
         throw Error('Error authenticating your code');
       }
     } catch (error) {
-      console.log(error);
-      res.status(400).json({ msg: error });
+      res.status(400).json({ error });
     }
   } else {
     // Handle any other HTTP method

@@ -44,7 +44,6 @@ export async function handler(req: NextApiRequest, res: NextApiResponse){
 //addUser create a new user
  async function addUser(conn: PSDB, req: NextApiRequest, res: NextApiResponse)  {
   var user = JSON.parse(req.body) 
-  console.log(user)
   try {
     var query = "INSERT INTO users ( name, email, password) VALUES (?,?,?)"
     var params = Object.values(user)

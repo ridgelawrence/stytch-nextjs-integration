@@ -38,6 +38,11 @@
 
 .primaryButton {
   background-color: #19303D;
+  position: relative;
+  margin-top: 50px;
+  width: 50%;
+  top: 50%;
+  left: 20%;
 }
 
 .primaryButton:disabled {

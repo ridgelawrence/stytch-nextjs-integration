@@ -34,7 +34,7 @@ const Profile = (props: Props) => {
     }
   });
 
-  function toggleOpen(){
+  function toggleOpenModal(){
     setOpen(!open);
   }
 
@@ -45,18 +45,23 @@ const Profile = (props: Props) => {
   function submitUser(){
     //do nothing if empty
     if(name=="" || email == "") {
-      toggleOpen()
+      toggleOpenModal()
       return
     }
 
-    //closes modal
-    toggleOpen()
+    //close modal
+    toggleOpenModal()
 
-
-    //invite the user if the email is valid
+    //validate email
     if (regexp.test(email)){
+      //invite the user via stytch
       inviteUser(60, name, email).then(resp => {
+        
+        //add user to table
         addUser(name,email, "temp").then(resp => {
+          let id = resp.id as number
+          usersState?.push({"id": id, "name": name, "email": email} as User)
+          setUsers(users)
           //opens popup
           toggleSubmit()
         }).catch(error => {
@@ -78,13 +83,13 @@ const Profile = (props: Props) => {
     
 
     //remove user from the list
-    users?.forEach(
+    usersState?.forEach(
       (element, index) =>{
-        if(element.id == id) delete users[index]
+        if(element.id == id) delete usersState[index]
       }
     )
 
-    setUsers(users)
+    setUsers(usersState)
   }
 
   const signOut = async () => {
@@ -99,9 +104,9 @@ const Profile = (props: Props) => {
       {!token ? (
         <div></div>
       ) : (
-        <div>
+        <div id="container">
 
-        <Notification open={open} toggle={toggleSubmit} />
+        <Notification open={submitOpen} toggle={toggleSubmit} />
 
         <StytchContainer>
       
@@ -110,17 +115,15 @@ const Profile = (props: Props) => {
          setName={setName}
          setEmail={setEmail}
          deleteUser={deleteUser} 
-         toggle={toggleOpen} 
+         toggle={toggleOpenModal} 
          isOpen={open} 
          submit={submitUser} 
          />
-
-
+         
+          </StytchContainer>
           <button className={styles.primaryButton} onClick={signOut}>
             Sign out
           </button>
-          </StytchContainer>
-
         </div>
       )}
     </>

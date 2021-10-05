@@ -10,7 +10,6 @@ open: boolean;
 
 const Notification = (props: Props) => {
     var {open, toggle} = props;
-  console.log(process.env.STYTCH_PUBLIC_TOKEN);
 
   return (
     <Collapse in={open}>

@@ -21,7 +21,6 @@ export async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
       const resp = await client.otps.sms.loginOrCreate(params);
       res.status(200).json({ methodId: resp.phone_id });
     } catch (error) {
-      console.log(error);
       res.status(400);
     }
   } else {

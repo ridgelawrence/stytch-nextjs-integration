@@ -12,12 +12,9 @@ type Data = {
 export async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
     var token = (req.query["token"] || req.cookies[process.env.COOKIE_NAME as string]) as string
     if (!validSessionToken(token)){
-        // Router.push("/")
         res.redirect("/")
         return;
-      } else {
-          console.log("did not redirect")
-      }
+      } 
 
   if (req.method === 'POST') {
       inviteUser(req,res)
@@ -40,7 +37,6 @@ function inviteUser(req: NextApiRequest, res: NextApiResponse){
 
     client.magicLinks.email.loginOrCreate(params)
     .then(resp => {
-        console.log(resp)
         res.status(200).json({"message":"success"})
     })
     .catch(error => {

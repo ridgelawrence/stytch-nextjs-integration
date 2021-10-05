@@ -15,7 +15,6 @@ type Data = {
 
 export async function handler(req: NextIronRequest, res: NextApiResponse<Data>) {
   
-  console.log("authenticating")
   if (req.method === 'GET') {
     const client = loadStytch();
     const { token } = req.query;
@@ -27,17 +26,10 @@ export async function handler(req: NextIronRequest, res: NextApiResponse<Data>) 
 
       //send user to profile with cookies in response
       res.setHeader('Set-Cookie', serialize(process.env.COOKIE_NAME as string, resp.session_token as string, { path: '/' }));
-      console.log("Session_token: ", resp.session_token)
-      console.log("Session_id: ", resp.session?.session_id)
-
-      //update global cookies
-      // const cookies = new Cookies(req, res)
-      // cookies.set(process.env.COOKIE_NAME,resp.session_token)
-
       res.redirect('/profile');
       return;
     } catch (error) {
-      console.log("Failed to login user", token , error);
+      console.error("Failed to login user", token );
       res.status(400).json({ error });
       return;
     }

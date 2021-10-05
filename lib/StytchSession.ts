@@ -23,7 +23,7 @@ export  function validSessionToken (token: string ): boolean {
         return true
      })
     .catch(err => { 
-        console.log("Failed to validate session. Token = ",token, err)
+        console.error("Failed to validate session. Token = ",token, err)
         return false
     });
     return true

@@ -9,7 +9,6 @@ type Props = {
 
 const LoginEntryPoint = (props: Props) => {
   const { setLoginMethod } = props;
-  console.log(process.env.STYTCH_PUBLIC_TOKEN);
 
   return (
     <StytchContainer>

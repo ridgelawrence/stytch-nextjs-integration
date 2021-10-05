@@ -27,7 +27,7 @@ const Notification = (props: Props) => {
     }
     sx={{ mb: 2 }}
   >
-    User was successfully <b> added </b>  - refresh the page.
+    Dashboard was updated.
   </Alert>
   </Collapse>
   );

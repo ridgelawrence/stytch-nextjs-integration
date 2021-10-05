@@ -6,8 +6,9 @@ const conn = new PSDB('main')
 export async function handler(req: NextApiRequest, res: NextApiResponse){
   var token = (req.query["token"] || req.cookies[process.env.COOKIE_NAME as string]) as string
   if (!validSessionToken(token)){
-    res.redirect("/")
-  }
+    res.status(401).json({"error": "unauthorized"})
+    return
+  } 
 
   if( req.method == 'GET'){
       getUser(conn, req, res)

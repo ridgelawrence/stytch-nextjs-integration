@@ -26,8 +26,8 @@ const Profile = (props: Props) => {
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [submitOpen, setSubmitOpen] = React.useState(false)
+  const [deleteOpen, setDeleteOpen] = React.useState(false)
   const [usersState, setUsers] = React.useState(users)
-  
   useEffect(() => {
     if (!token) {
       router.replace('/');
@@ -40,6 +40,10 @@ const Profile = (props: Props) => {
 
   function toggleSubmit(){
     setSubmitOpen(!submitOpen)
+  }
+
+  function toggleDelete(){
+    setDeleteOpen(!deleteOpen)
   }
   
   function submitUser(){
@@ -56,9 +60,15 @@ const Profile = (props: Props) => {
     if (regexp.test(email)){
       //invite the user via stytch
       inviteUser(60, name, email).then(resp => {
-        
+        if(resp.status == 401) {
+          router.push("/")
+        }
         //add user to table
         addUser(name,email, "temp").then(resp => {
+          if(resp.status == 401) {
+            router.push("/")
+          }
+
           let id = resp.id as number
           usersState?.push({"id": id, "name": name, "email": email} as User)
           setUsers(users)
@@ -79,17 +89,24 @@ const Profile = (props: Props) => {
 
   function deleteUser(id: number){
     //remove user fromt the DB
-    deleteUserById(id)
+    deleteUserById(id).then( resp => {
+      if(resp.status == 401) {
+        router.push("/")
+      }
+    }
+    )
     
+    console.log("Before array delete", usersState)
 
     //remove user from the list
     usersState?.forEach(
       (element, index) =>{
-        if(element.id == id) delete usersState[index]
+        if(element.id == id) usersState.splice(index, 1)
       }
     )
 
     setUsers(usersState)
+    toggleDelete()
   }
 
   const signOut = async () => {
@@ -107,6 +124,7 @@ const Profile = (props: Props) => {
         <div id="container">
 
         <Notification open={submitOpen} toggle={toggleSubmit} />
+        <Notification open={deleteOpen} toggle={toggleDelete} />
 
         <StytchContainer>
       

@@ -2,6 +2,7 @@ import React from 'react';
 import styles from '../styles/Home.module.css';
 import { sendOTP } from '../lib/otpUtils';
 import { useRouter } from 'next/router';
+import { useStytchLazy } from '@stytch/stytch-react';
 
 // Handles auto-tabbing to next passcode digit input.
 // Logic inspired from https://stackoverflow.com/questions/15595652/focus-next-input-once-reaching-maxlength-value.
@@ -40,6 +41,7 @@ const VerifyOTPForm = (props: Props) => {
   const [currentMethodId, setCurrentMethodId] = React.useState(methodId);
   const [isError, setIsError] = React.useState(false);
   const router = useRouter();
+  const stytchClient = useStytchLazy();
 
   const strippedNumber = phoneNumber.replace(/\D/g, '');
   const parsedPhoneNumber = `(${strippedNumber.slice(0, 3)}) ${strippedNumber.slice(3, 6)}-${strippedNumber.slice(
@@ -91,15 +93,10 @@ const VerifyOTPForm = (props: Props) => {
       for (let i = 0; i < inputs.length; i++) {
         otpInput += (inputs[i] as HTMLInputElement).value;
       }
-
-      const resp = await fetch('/api/authenticate_otp', {
-        method: 'POST',
-        body: JSON.stringify({ otpInput, methodId: currentMethodId }),
-      });
-
-      if (resp.status === 200) {
+      try {
+        const resp = await stytchClient.otps.authenticate(otpInput, currentMethodId, { session_duration_minutes: 30 });
         router.push('/profile');
-      } else {
+      } catch (error) {
         setIsError(true);
         resetPasscode();
       }

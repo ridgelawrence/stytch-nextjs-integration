@@ -3,6 +3,7 @@ import styles from '../styles/Home.module.css';
 import StytchContainer from '../components/StytchContainer';
 import withSession, { ServerSideProps } from '../lib/withSession';
 import { useRouter } from 'next/router';
+import { useStytchSession } from '@stytch/stytch-react';
 
 type Props = {
   user?: {
@@ -11,14 +12,16 @@ type Props = {
 };
 
 const Profile = (props: Props) => {
+  const session = useStytchSession();
+  console.log(session);
   const { user } = props;
   const router = useRouter();
 
-  useEffect(() => {
-    if (!user) {
-      router.replace('/');
-    }
-  });
+  // useEffect(() => {
+  //   if (!user) {
+  //     router.replace('/');
+  //   }
+  // });
 
   const signOut = async () => {
     const resp = await fetch('/api/logout', { method: 'POST' });

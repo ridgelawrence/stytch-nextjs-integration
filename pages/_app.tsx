@@ -2,10 +2,13 @@ import '../styles/globals.css';
 import styles from '../styles/Home.module.css';
 import type { AppProps } from 'next/app';
 import React from 'react';
+import { StytchProvider, loadAndInitStytch } from '@stytch/stytch-react';
 import Head from 'next/head';
 import Image from 'next/image';
 import stytchLogo from '/public/stytch-logo.svg';
 import nextjsLogo from '/public/nextjs-logotype-dark.svg';
+
+const stytchPromise = loadAndInitStytch(process.env.STYTCH_PUBLIC_TOKEN || '');
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -32,7 +35,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         </div>
       </div>
       <div className={styles.root}>
-        <Component {...pageProps} />
+        <StytchProvider stytch={stytchPromise}>
+          <Component {...pageProps} />
+        </StytchProvider>
       </div>
     </>
   );

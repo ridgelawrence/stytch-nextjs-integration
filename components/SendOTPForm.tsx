@@ -1,6 +1,7 @@
 import React from 'react';
 import { sendOTP } from '../lib/otpUtils';
 import styles from '../styles/Home.module.css';
+import { useStytchLazy } from '@stytch/stytch-react';
 
 type Props = {
   phoneNumber: string;
@@ -12,6 +13,7 @@ type Props = {
 const SendOTPForm = (props: Props): JSX.Element => {
   const { phoneNumber, setMethodId, setOTPSent, setPhoneNumber } = props;
   const [isDisabled, setIsDisabled] = React.useState(true);
+  const stytchClient = useStytchLazy();
 
   const isValidNumber = (phoneNumberValue: string) => {
     // Regex validates phone numbers in (xxx)xxx-xxxx, xxx-xxx-xxxx, xxxxxxxxxx, and xxx.xxx.xxxx format
@@ -34,7 +36,7 @@ const SendOTPForm = (props: Props): JSX.Element => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isValidNumber(phoneNumber)) {
-      const methodId = await sendOTP(phoneNumber);
+      const { method_id: methodId } = await stytchClient.otps.sms.loginOrCreate('+1' + phoneNumber);
       setMethodId(methodId);
       setOTPSent(true);
     }

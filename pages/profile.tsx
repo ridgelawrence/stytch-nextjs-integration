@@ -3,6 +3,7 @@ import styles from '../styles/Home.module.css';
 import StytchContainer from '../components/StytchContainer';
 import withSession, { ServerSideProps } from '../lib/withSession';
 import { useRouter } from 'next/router';
+import { useStytchUser, useStytchSession, useStytchLazy } from '@stytch/stytch-react';
 
 type Props = {
   user?: {
@@ -11,14 +12,31 @@ type Props = {
 };
 
 const Profile = (props: Props) => {
-  const { user } = props;
+  const user = useStytchUser();
+  const session = useStytchSession();
+  const stytch = useStytchLazy();
+  console.log('GET SYNC', stytch?.user.getSync());
+
+  if (process.browser) {
+    console.log('FRONTEND USER:', user);
+  } else {
+    console.log('BACKEND USER:', user);
+  }
+
+  if (process.browser) {
+    console.log('FRONTEND SESSION:', session);
+  } else {
+    console.log('BACKEND SESSION:', session);
+  }
+
   const router = useRouter();
 
-  useEffect(() => {
-    if (!user) {
-      router.replace('/');
-    }
-  });
+  // Commented out because this breaks :(
+  // useEffect(() => {
+  //   if (process.browser && !user) {
+  //     router.replace('/');
+  //   }
+  // });
 
   const signOut = async () => {
     const resp = await fetch('/api/logout', { method: 'POST' });

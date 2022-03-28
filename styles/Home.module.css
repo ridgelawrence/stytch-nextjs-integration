@@ -204,4 +204,5 @@
   font-family: IBM Plex Mono, monospace;
   margin-bottom: 16px;
   white-space: pre-wrap;
+  overflow-y: scroll;
 }
